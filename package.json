@@ -41,7 +41,10 @@
     "typecheck": "tsc --noEmit",
     "dev": "vitest",
     "clean": "rm -rf dist node_modules/.cache",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build && npm test",
+    "app:dev": "cd apps/web && npx vite",
+    "app:build": "cd apps/web && npx vite build",
+    "app:preview": "cd apps/web && npx vite preview"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
