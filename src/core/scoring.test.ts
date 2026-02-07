@@ -83,6 +83,33 @@ describe("scoring", () => {
       // High weight on the deviating dimension → lower balance score
       expect(scoreHigh).toBeLessThan(scoreLow);
     });
+
+    it("uses S_bal = 1/(1+D_bal) formula per Section 6.2", () => {
+      // Single deviation: dim 0 off by 0.5 with weight 1.0
+      // D_bal = sqrt((1.0 * 0.5)^2) = 0.5
+      // S_bal = 1 / (1 + 0.5) = 0.6667
+      const norm = flavorVector([0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      const target = flavorVector([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      const weights = flavorVector([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      expect(computeBalanceScore(norm, target, weights)).toBeCloseTo(1 / 1.5);
+    });
+
+    it("is always strictly positive (never reaches 0)", () => {
+      // Even with extreme deviations, 1/(1+D) > 0
+      const norm = flavorVector([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+      const target = flavorVector([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      const weights = flavorVector([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      const score = computeBalanceScore(norm, target, weights);
+      expect(score).toBeGreaterThan(0);
+      expect(score).toBeLessThan(0.1);
+    });
+
+    it("returns 1.0 with zero weights", () => {
+      const norm = flavorVector([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      const target = flavorVector([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      const weights = flavorVector([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      expect(computeBalanceScore(norm, target, weights)).toBe(1.0);
+    });
   });
 
   describe("evaluateStructuralCoverage (3.3)", () => {

@@ -47,9 +47,17 @@ export {
 export {
   dot,
   norm,
+  normInf,
   cosineSimilarity,
+  addVectors,
+  subtractVectors,
+  scaleVector,
+  absVector,
+  normalizeToProfile,
   bankersRound,
   withinTolerance,
+  EPSILON_ABS,
+  EPSILON_REL,
 } from "./core/vector-math.js";
 
 export {
@@ -60,8 +68,6 @@ export {
 
 export {
   applyMethodKernel,
-  getMethodMultipliers,
-  type MethodMultipliers,
 } from "./core/method-kernel.js";
 
 export {
@@ -76,8 +82,11 @@ export {
   evaluateStructuralCoverage,
   computeClashPenalty,
   computeFinalScore,
-  REQUIRED_ROLES_BY_DISH_TYPE,
-  CLASH_MATRIX,
+  interpretScore,
+  DEFAULT_CLASH_MATRIX,
+  clashKey,
+  type ClashMatrix,
+  type ClashKey,
 } from "./core/scoring.js";
 
 export {

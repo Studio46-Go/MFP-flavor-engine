@@ -106,4 +106,31 @@ describe("method-kernel", () => {
       }
     });
   });
+
+  describe("input validation", () => {
+    it("clamps heatLevel to [0, 1]", () => {
+      const v = flavorVector([0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      const normal = applyMethodKernel(v, SolubilityClass.WATER, 0.0, 1.0, CookingMethod.HIGH_HEAT_SEAR);
+      const overMax = applyMethodKernel(v, SolubilityClass.WATER, 0.0, 2.0, CookingMethod.HIGH_HEAT_SEAR);
+      // heatLevel 2.0 should be clamped to 1.0, producing the same result
+      expect(overMax[FlavorDimension.ROASTED]).toBeCloseTo(normal[FlavorDimension.ROASTED]);
+    });
+
+    it("clamps negative heatLevel to 0", () => {
+      const v = flavorVector([0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0]);
+      const raw = applyMethodKernel(v, SolubilityClass.WATER, 0.0, 0.0, CookingMethod.HIGH_HEAT_SEAR);
+      const neg = applyMethodKernel(v, SolubilityClass.WATER, 0.0, -0.5, CookingMethod.HIGH_HEAT_SEAR);
+      // Negative heat should be clamped to 0, same as heatLevel=0
+      expect(neg[FlavorDimension.ROASTED]).toBeCloseTo(raw[FlavorDimension.ROASTED]);
+      expect(neg[FlavorDimension.HERBAL]).toBeCloseTo(raw[FlavorDimension.HERBAL]);
+    });
+
+    it("clamps volatility to [0, 1]", () => {
+      const v = flavorVector([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0]);
+      const normal = applyMethodKernel(v, SolubilityClass.WATER, 1.0, 0.8, CookingMethod.HIGH_HEAT_SEAR);
+      const overVol = applyMethodKernel(v, SolubilityClass.WATER, 2.0, 0.8, CookingMethod.HIGH_HEAT_SEAR);
+      // volatility 2.0 should be clamped to 1.0
+      expect(overVol[FlavorDimension.HERBAL]).toBeCloseTo(normal[FlavorDimension.HERBAL]);
+    });
+  });
 });

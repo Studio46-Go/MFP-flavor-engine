@@ -46,5 +46,10 @@ describe("normalization", () => {
       const roles = new Set([StructuralRole.PROTEIN]);
       expect(computeAlpha(0, roles, DishType.COMPLETE_PLATE)).toBe(0);
     });
+
+    it("clamps negative quantities to 0", () => {
+      const roles = new Set([StructuralRole.PROTEIN]);
+      expect(computeAlpha(-100, roles, DishType.COMPLETE_PLATE)).toBe(0);
+    });
   });
 });

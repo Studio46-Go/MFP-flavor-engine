@@ -33,32 +33,29 @@ export function computeSimilarity(a: FlavorVector, b: FlavorVector): number {
 /**
  * Compute balance score against a target profile.
  *
- * Δ = |V_norm - B_target|
- * S_bal = 1 - ( Σ_k W_bal[k] × Δ[k] ) / ( Σ_k W_bal[k] )
+ * Section 6.2:
+ *   D_bal = || (V_norm − B_target) ⊙ W_bal ||₂
+ *   S_bal = 1 / (1 + D_bal)
  *
  * @param normalizedVector V_norm of the dish
  * @param targetProfile B_target style/cuisine signature
  * @param weights W_bal per-dimension importance weights
- * @returns S_bal ∈ [0, 1]
+ * @returns S_bal ∈ (0, 1]
  */
 export function computeBalanceScore(
   normalizedVector: FlavorVector,
   targetProfile: FlavorVector,
   weights: FlavorVector
 ): number {
-  let weightedDeviation = 0;
-  let totalWeight = 0;
+  let sumSquared = 0;
 
   for (let k = 0; k < FLAVOR_DIMENSIONS; k++) {
-    const delta = Math.abs(normalizedVector[k] - targetProfile[k]);
-    weightedDeviation += weights[k] * delta;
-    totalWeight += weights[k];
+    const weightedDelta = weights[k] * (normalizedVector[k] - targetProfile[k]);
+    sumSquared += weightedDelta * weightedDelta;
   }
 
-  if (totalWeight === 0) return 1;
-
-  const score = 1 - weightedDeviation / totalWeight;
-  return Math.max(0, Math.min(1, score));
+  const D_bal = Math.sqrt(sumSquared);
+  return 1 / (1 + D_bal);
 }
 
 // ─── 3.3 Structural Role Coverage ───────────────────────────────────────────
@@ -91,6 +88,7 @@ const REQUIRED_ROLES: Record<string, Set<StructuralRole>> = {
     StructuralRole.VEGETABLE,
   ]),
   SOUP: new Set([
+    StructuralRole.LIQUID_BASE,
     StructuralRole.FAT,
     StructuralRole.AROMATIC,
     StructuralRole.UMAMI_BOOST,

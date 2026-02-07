@@ -70,5 +70,5 @@ export function computeAlpha(
       break;
   }
 
-  return Math.min(1.0, quantity / Q);
+  return Math.min(1.0, Math.max(0, quantity) / Q);
 }
