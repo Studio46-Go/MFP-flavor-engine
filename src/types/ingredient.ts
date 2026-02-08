@@ -98,6 +98,7 @@ export function getComponentCategory(roles: Set<StructuralRole>): ComponentCateg
     StructuralRole.PROTEIN,
     StructuralRole.STARCH,
     StructuralRole.VEGETABLE,
+    StructuralRole.LIQUID_BASE,
   ]);
   const finishRoles = new Set([
     StructuralRole.HERB_FINISH,

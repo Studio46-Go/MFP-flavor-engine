@@ -382,7 +382,7 @@ function getTestQuantities(card: IngredientCard, dishType: DishType): number[] {
   const isFinish = card.roles.has(StructuralRole.HERB_FINISH);
 
   if (isPrimary) {
-    return dishType === "SNACK" as DishType ? [30, 60, 100] : [50, 100, 200];
+    return dishType === DishType.SNACK ? [30, 60, 100] : [50, 100, 200];
   }
   if (isFinish) {
     return [3, 5, 10];

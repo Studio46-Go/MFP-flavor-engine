@@ -143,8 +143,7 @@ export function findMinimalFixes(ctx: RecommendationContext): Recommendation[] {
     }
   }
 
-  deviations.sort((a, b) => Math.abs(b.delta) * b.dim - Math.abs(a.delta) * a.dim);
-  // Re-sort by weighted magnitude
+  // Sort by weighted magnitude (largest weighted deviation first)
   deviations.sort(
     (a, b) =>
       Math.abs(b.delta) * ctx.balanceWeights[b.dim] -
@@ -323,7 +322,7 @@ export function findMethodAdjustments(ctx: RecommendationContext): Recommendatio
       type: "METHOD_ADJUSTMENT",
       description:
         "Add RAW_FINISH step for herbs/citrus to preserve volatile aromatics lost during high-heat cooking",
-      deltaScore: (herbalGap + citrusGap) * 0.05,
+      deltaScore: (Math.max(0, herbalGap) + Math.max(0, citrusGap)) * 0.05,
       methodChange: "RAW_FINISH",
     });
   }
@@ -383,7 +382,7 @@ function getTestQuantities(card: IngredientCard, dishType: DishType): number[] {
   const isFinish = card.roles.has(StructuralRole.HERB_FINISH);
 
   if (isPrimary) {
-    return dishType === "SNACK" as DishType ? [30, 60, 100] : [50, 100, 200];
+    return dishType === DishType.SNACK ? [30, 60, 100] : [50, 100, 200];
   }
   if (isFinish) {
     return [3, 5, 10];

@@ -158,6 +158,16 @@ describe("scoring", () => {
       const result = evaluateStructuralCoverage(ingredients, DishType.COMPLETE_PLATE);
       expect(result.passed).toBe(false);
     });
+
+    it("requires LIQUID_BASE for SOUP (Section 7)", () => {
+      const ingredients: DishIngredient[] = [
+        makeIngredient("fat", [StructuralRole.FAT], 30),
+        makeIngredient("aromatic", [StructuralRole.AROMATIC], 20),
+        makeIngredient("veg", [StructuralRole.VEGETABLE], 100),
+      ];
+      const result = evaluateStructuralCoverage(ingredients, DishType.SOUP);
+      expect(result.missingRoles.has(StructuralRole.LIQUID_BASE)).toBe(true);
+    });
   });
 
   describe("computeClashPenalty (3.4)", () => {
@@ -194,6 +204,17 @@ describe("scoring", () => {
         makeIngredient("one", [StructuralRole.PROTEIN], 200, IngredientClass.FISHY),
       ];
       expect(computeClashPenalty(ingredients, [1.0], 0.5)).toBe(0);
+    });
+
+    it("clamps heatLevel to [0, 1]", () => {
+      const ingredients: DishIngredient[] = [
+        makeIngredient("citrus", [StructuralRole.ACID], 20, IngredientClass.CITRUS),
+        makeIngredient("milk", [StructuralRole.FAT], 100, IngredientClass.MILK),
+      ];
+      const atMax = computeClashPenalty(ingredients, [0.8, 0.8], 1.0);
+      const overMax = computeClashPenalty(ingredients, [0.8, 0.8], 5.0);
+      // heatLevel=5.0 should be clamped to 1.0, giving the same result
+      expect(overMax).toBeCloseTo(atMax);
     });
   });
 

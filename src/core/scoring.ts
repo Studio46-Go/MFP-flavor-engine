@@ -212,6 +212,7 @@ export function computeClashPenalty(
 ): number {
   const cm = clashMatrix ?? DEFAULT_CLASH_MATRIX;
   const n = ingredients.length;
+  const H = Math.max(0, Math.min(1, heatLevel));
 
   if (n < 2) return 0;
 
@@ -233,7 +234,7 @@ export function computeClashPenalty(
       const gIntensity = Math.min(1, (alphas[i] + alphas[j]) / 2);
 
       // g_method: higher heat amplifies curdle/bitterness risks
-      const gMethod = 1.0 + 0.5 * heatLevel;
+      const gMethod = 1.0 + 0.5 * H;
 
       const r = c * gIntensity * gMethod;
       totalRisk += r;

@@ -51,5 +51,11 @@ describe("normalization", () => {
       const roles = new Set([StructuralRole.PROTEIN]);
       expect(computeAlpha(-100, roles, DishType.COMPLETE_PLATE)).toBe(0);
     });
+
+    it("classifies LIQUID_BASE as PRIMARY", () => {
+      const roles = new Set([StructuralRole.LIQUID_BASE]);
+      // SOUP has Q_primary=250, so 125g → α = 0.5
+      expect(computeAlpha(125, roles, DishType.SOUP)).toBeCloseTo(0.5);
+    });
   });
 });

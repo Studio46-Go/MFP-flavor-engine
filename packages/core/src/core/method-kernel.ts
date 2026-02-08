@@ -181,29 +181,31 @@ export function applyMethodKernel(
 ): FlavorVector {
   const kernel = METHOD_KERNELS[method];
   const result = new Float64Array(FLAVOR_DIMENSIONS);
+  const H = Math.max(0, Math.min(1, heatLevel));
+  const vol = Math.max(0, Math.min(1, volatility));
 
   for (let k = 0; k < FLAVOR_DIMENSIONS; k++) {
     let value = vector[k];
 
-    // Apply base modifiers
+    // Apply base modifiers (Section 4: multipliers MUST NOT become negative)
     const baseMod = kernel.modifiers[k as FlavorDimension];
     if (baseMod !== undefined) {
-      value *= baseMod;
+      value *= Math.max(0, baseMod);
     }
 
     // Apply heat-scaled modifiers: interpolate between 1.0 and modifier based on H
     const heatMod = kernel.heatScaled[k as FlavorDimension];
     if (heatMod !== undefined) {
-      const scaledMod = 1.0 + (heatMod - 1.0) * heatLevel;
+      const scaledMod = Math.max(0, 1.0 + (heatMod - 1.0) * H);
       value *= scaledMod;
     }
 
     // Volatility loss: volatile compounds degrade with heat
     // Fat-soluble ingredients are partially protected
-    if (volatility > 0 && heatLevel > 0) {
+    if (vol > 0 && H > 0) {
       const protectionFactor = solubility === SolubilityClass.FAT ? 0.5 : 1.0;
-      const loss = volatility * heatLevel * kernel.volatilityLossFactor * protectionFactor;
-      value *= (1.0 - loss);
+      const loss = vol * H * kernel.volatilityLossFactor * protectionFactor;
+      value *= Math.max(0, 1.0 - loss);
     }
 
     // Clamp to [0, 5]
